@@ -1,7 +1,7 @@
 === ApiCheck ===
 Author URI: https://apicheck.nl
 Plugin URI: https://apicheck.nl/wordpress-woocommerce
-Contributors: ApiCheck.nl
+Contributors: ApiCheck
 Tags: WooCommerce, Postcode validatie, België, Nederland, Postcode aanvulling
 Requires at least: 5.2
 Tested up to: 5.9

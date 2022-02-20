@@ -30,7 +30,7 @@ function ac_plugin_settings_page()
 ?>
     <div class="wrap" style="background: #fff; padding: 10px 20px;">
 
-        <img height="60px" src="/wp-content/plugins/apicheck-woocommerce-postocde-checker/assets/img/logo.png" alt="ApiCheck Logo">
+        <img height="60px" src="/wp-content/plugins/apicheck-woocommerce-postcode-checker/assets/img/logo.png" alt="ApiCheck Logo">
 
         <h1>ApiCheck WooCommerce</h1>
         <hr>
