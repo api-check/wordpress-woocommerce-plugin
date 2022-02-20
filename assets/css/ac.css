@@ -1,0 +1,74 @@
+.houseNo {
+	display: none;
+}
+
+#billing_country_field .select2-container {
+	margin-bottom: 15px;
+	display: block;
+}
+
+#billing_country_field .select2-container {
+	margin-bottom: 15px;
+	display: block;
+}
+
+#billing_postcode_field {
+	display: none !important;
+}
+
+#house_no {
+	margin-bottom: 15px;
+}
+.loadinggif {
+	background: url(/wp-content/plugins/apicheck-woocommerce-postcode-checker/front/ajax-loader.gif) no-repeat right center;
+	background-size: 6%;
+}
+
+#billing_country_field .LeftSide {
+	width: 30%;
+	float: left;
+}
+#billing_country_field .MiddleSide {
+	width: 30%;
+	float: left;
+	margin-left: 26px;
+	margin-right: 26px;
+}
+
+#billing_country_field .RightSide {
+	width: 30%;
+	float: left;
+}
+
+#billing_address_2_field {
+	display: none !important;
+}
+
+.acMessage {
+	background: #ff000091;
+	padding: 10px 20px;
+	color: #222;
+}
+
+.address-field span.woocommerce-input-wrapper {
+	display: block;
+	margin-bottom: 20px;
+}
+
+@media (min-width: 320px) and (max-width: 568px) {
+	#billing_country_field .LeftSide {
+		width: 100%;
+		float: left;
+	}
+
+	#billing_country_field .MiddleSide {
+		width: 100%;
+		float: left;
+		margin: 0px;
+	}
+
+	#billing_country_field .RightSide {
+		width: 100%;
+		float: left;
+	}
+}
