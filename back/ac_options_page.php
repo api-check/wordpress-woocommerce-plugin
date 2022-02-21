@@ -60,4 +60,4 @@ function ac_plugin_settings_page()
             <?php submit_button(); ?>
         </form>
     </div>
-    <?php } ?>s
+    <?php } ?>
