@@ -7,22 +7,25 @@
  * @package       APICHECK
  * @author        ApiCheck.nl
  * @license       gplv2
- * @version       1.0.1
+ * @version       1.0.2
  *
  * @wordpress-plugin
  * Plugin Name:   ApiCheck | Automatische Adres Aanvulling
  * Plugin URI:    https://apicheck.nl/wordpress-woocommerce
  * Description:   Deze plugin helpt de gebruikers bij het invullen van adresgegevens. Het doel van de plugin is het voorkomen van fouten tijdens het invullen van adresgegevens. Zodra een Nederlandse, Belgische of Luxemburgse gebruikers zijn/haar postcode en huisnummer invult haalt onze database direct de straat- en plaatsnaam erbij.
- * Version:       1.0.1
+ * Version:       1.0.2
  * Author:        ApiCheck
  * Author URI:    https://apicheck.nl/
  * Text Domain:   apicheck-woocommerce-postcode-checker
  * Domain Path:   /languages
- * License:       GPLv2
- * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
+ * License:       GPLv3
+ * License URI:   https://www.gnu.org/licenses/gpl-3.0.html
  *
+ * WC requires at least: 3.7.0
+ * WC tested up to: 6.8.0
+ * 
  * You should have received a copy of the GNU General Public License
- * along with ApiCheck Address Validator. If not, see <https://www.gnu.org/licenses/gpl-2.0.html/>.
+ * along with ApiCheck Address Validator. If not, see <https://www.gnu.org/licenses/gpl-3.0.html/>.
  */
 
 // Exit if accessed directly.
