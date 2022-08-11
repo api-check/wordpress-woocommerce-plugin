@@ -24,7 +24,7 @@ Search for the plugin in the Wordpress plugin library, and install the plugin fr
 
 ## How to Use
 
-In your WordPress administration panel go to `Plugins > Installed Plugins` and look for `ApicApiCheck WooCommerce Address Validator` and activate it. Then click on `ApiCheck` in the sidebar to configure the plugin.
+In your WordPress administration panel go to `Plugins > Installed Plugins` and look for `ApiCheck WooCommerce Address Validator` and activate it. Then click on `ApiCheck` in the sidebar to configure the plugin.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -32,7 +32,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ## Support
 Contact: [www.apicheck.nl](https://www.apicheck.nl) — support@apicheck.nl

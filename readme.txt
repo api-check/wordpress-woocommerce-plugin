@@ -6,7 +6,9 @@ Tags: WooCommerce, Postcode validatie, België, Nederland, Luxemburg, Postcode a
 Requires at least: 5.2
 Tested up to: 6.1
 Requires PHP: 7.0
-Stable tag: 1.0.0
+Stable tag: 1.0.3
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 ApiCheck | Deze plugin helpt de gebruikers bij het invullen van adresgegevens door middel van onze adres API.
 
