@@ -1,0 +1,15 @@
+.acMessage {
+    background: #ff000091;
+    padding: 10px 20px;
+    color: #222;
+}
+
+.loadinggif {
+    background: url('../img/ajax-loader.gif') no-repeat right center !important;
+    background-size: 9% !important;
+}
+
+.hidden-checkout-field {
+    visibility: hidden !important;
+    display: none !important;
+}

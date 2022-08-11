@@ -21,43 +21,56 @@ function register_ac_plugin_settings()
     register_setting('ac-plugin-settings-group', 'ac_error_message');
 
     // Set default values
-    update_option('ac_error_message', 'Er is geen adres gevonden. Vul je adres handmatig in.');
+    update_option('ac_error_message', 'Er is geen adres gevonden met deze gegevens. Controleer en vul je adres handmatig in.');
     update_option('ac_api_url', 'https://api.apicheck.nl/lookup/v1/postalcode/');
 }
 
 function ac_plugin_settings_page()
 {
-?>
+    ?>
     <div class="wrap" style="background: #fff; padding: 10px 20px;">
 
-        <img height="60px" src="/wp-content/plugins/apicheck-woocommerce-postcode-checker/assets/img/logo.png" alt="ApiCheck Logo">
+        <img height="60px" src="<?php echo(APICHECK_PLUGIN_URL) ?>/assets/img/logo.png" alt="ApiCheck Logo">
 
-        <h1>ApiCheck WooCommerce</h1>
+        <h1>ApiCheck</h1>
         <hr>
+
+        <p>
+            Met onze postcode API is het mogelijk om adressen automatisch te laten aanvullen. <br>
+            De klant vult postcode en huisnummer in en krijgt vervolgens direct zijn straatnaam te zien.
+        </p>
 
         <form method="post" action="options.php">
             <?php settings_fields('ac-plugin-settings-group'); ?>
             <?php do_settings_sections('ac-plugin-settings-group'); ?>
-            <table class="form-table">
 
+            <table class="form-table">
                 <tr valign="top">
-                    <th scope="row">Schakel plugin in </th>
-                    <td><input type="checkbox" name="ac_enable_disabled" value="1" <?php checked(1, get_option('ac_enable_disabled'), true); ?> /></td>
+                    <th scope="row">Schakel plugin in</th>
+                    <td><input type="checkbox" name="ac_enable_disabled"
+                               value="1" <?php checked(1, get_option('ac_enable_disabled'), true); ?> /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">API Key</th>
-                    <td><input type="text" name="ac_api_key" value="<?php echo esc_attr(get_option('ac_api_key')); ?>" style="width:100%;" placeholder="Vul je APiCheck api-key in" /></td>
+                    <td>
+                        <input class="regular-text" type="text" name="ac_api_key"
+                               value="<?php echo esc_attr(get_option('ac_api_key')); ?>"
+                               placeholder="Vul je APiCheck api-key in"/>
+                    </td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Melding geen adres gevonden</th>
-                    <td><input type="text" name="ac_error_message" value="<?php echo esc_attr(get_option('ac_error_message')); ?>" style="width:100%;" placeholder="Welke melding moet er getoont worden indien er geen adres is gevonden?" /></td>
+                    <td>
+                        <input class="regular-text" type="text" name="ac_error_message"
+                               value="<?php echo esc_attr(get_option('ac_error_message')); ?>"
+                               placeholder="Welke melding moet er getoont worden indien er geen adres is gevonden?"/>
+                    </td>
                 </tr>
-
             </table>
 
             <?php submit_button(); ?>
         </form>
     </div>
-    <?php } ?>
+<?php } ?>

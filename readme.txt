@@ -2,13 +2,13 @@
 Author URI: https://apicheck.nl
 Plugin URI: https://apicheck.nl/wordpress-woocommerce
 Contributors: ApiCheck
-Tags: WooCommerce, Postcode validatie, België, Nederland, Postcode aanvulling
+Tags: WooCommerce, Postcode validatie, België, Nederland, Luxemburg, Postcode aanvulling, Postcode api, Adres validatie woocommerce
 Requires at least: 5.2
-Tested up to: 5.9
+Tested up to: 6.1
 Requires PHP: 7.0
 Stable tag: 1.0.0
 
-Deze plugin helpt de gebruikers bij het invullen van adresgegevens. Het doel van de plugin is het voorkomen van fouten tijdens het invullen van adresgegevens. Zodra een Nederlandse of Belgische gebruikers zijn/haar postcode en huisnummer invult haalt onze database direct de straat- en plaatsnaam erbij.
+WooCommerce | Deze plugin helpt de gebruikers bij het invullen van adresgegevens door middel van onze adres API.
 
 == Description ==
 
@@ -21,14 +21,19 @@ Voordelen Plugin:
 -	Eenvoudig in gebruik;
 -	Snelle response van API server;
 
+Ondersteuning voor de landen:
+-   Nederland
+-   België
+-   Luxemburg
+
+Toekomstige ondersteuning:
+-   Frankrijk
+-   Duitsland
+
 Eenvoudig & Flexibel
 De WooCommerce Plugin werkt eenvoudig en bevat een goede uitleg, daarnaast is deze ook zeer flexibel in gebruik.
 
 Deze plugin werkt in samenwerking met APICheck.nl & is volledig compatible met WooCommerce.
-
-== Frequently Asked Questions ==
-
-= A question that someone might have =
 
 == Installation ==
 
