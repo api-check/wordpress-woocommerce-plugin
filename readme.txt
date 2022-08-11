@@ -8,7 +8,7 @@ Tested up to: 6.1
 Requires PHP: 7.0
 Stable tag: 1.0.0
 
-WooCommerce | Deze plugin helpt de gebruikers bij het invullen van adresgegevens door middel van onze adres API.
+ApiCheck | Deze plugin helpt de gebruikers bij het invullen van adresgegevens door middel van onze adres API.
 
 == Description ==
 
