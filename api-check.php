@@ -148,10 +148,10 @@ class APICheck
             wp_register_script('ac-script', plugins_url('assets/js/apicheck.js', __FILE__), array('jquery', 'woocommerce'), '1.0.0', true);
             wp_enqueue_script('ac-script');
 
-            wp_localize_script('ac-script', 'spikkl_billing_fields', self::$_billing);
-            wp_localize_script('ac-script', 'spikkl_shipping_fields', self::$_shipping);
+            wp_localize_script('ac-script', 'apicheck_billing_fields', self::$_billing);
+            wp_localize_script('ac-script', 'apicheck_shipping_fields', self::$_shipping);
 
-            wp_localize_script('ac-script', 'spikkl_params', array(
+            wp_localize_script('ac-script', 'apicheck_params', array(
                 'url' => admin_url('admin-ajax.php'),
                 'action' => self::$_action,
                 'supported_countries' => self::$_supported_countries,
@@ -388,10 +388,6 @@ class APICheck
             // Concatenate street all into address_1
             $posted[$group . '_address_1'] = $posted[$streetName] . ' ' . trim($posted[$streetNumber] . ' ' . ($posted[$streetNumberSuffix] ?? ''));
         }
-
-        write_log('new posted below');
-        write_log($posted);
-
         return $posted;
     }
 
