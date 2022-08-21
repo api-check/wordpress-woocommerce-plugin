@@ -4,9 +4,9 @@ Plugin URI: https://apicheck.nl/wordpress-woocommerce
 Contributors: ApiCheck
 Tags: WooCommerce, Postcode validatie, België, Nederland, Luxemburg, Postcode aanvulling, Postcode api, Adres validatie woocommerce
 Requires at least: 5.2
-Tested up to: 6.1
+Tested up to: 6.0.1
 Requires PHP: 7.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

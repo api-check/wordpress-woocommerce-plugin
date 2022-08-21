@@ -182,7 +182,6 @@ jQuery(document).ready(function ($) {
             this.streetAutocompleteChange(fields.prefix);
         });
 
-
         this.setupFields(fields.prefix);
     };
 
@@ -200,28 +199,32 @@ jQuery(document).ready(function ($) {
     };
 
     LookupHandler.prototype.setupFields = function (prefix) {
-        let selectedCountryCode = this.getSelectedCountryCode();
-        this.reorderFields(selectedCountryCode);
-        this.listen(selectedCountryCode);
-        this.autoFillMyParcelFields(prefix);
+        setTimeout(() => {
+            let selectedCountryCode = this.getSelectedCountryCode();
+            this.reorderFields(selectedCountryCode);
+            this.listen(selectedCountryCode);
+            this.autoFillMyParcelFields(prefix);
+        }, 1);
     };
 
     LookupHandler.prototype.listen = function (selectedCountryCode) {
-        if (this.isCountryEligibleForLookup(selectedCountryCode)) {
-            this.applyFieldsLock();
-        } else {
-            this.$postcode.off('blur input');
-            this.$housenumber.off('blur input');
-            this.$housenumberAddition.off('blur input');
-            this.hardResetFields();
-            this.releaseFieldsLock();
-        }
+        setTimeout(() => {
+            if (this.isCountryEligibleForLookup(selectedCountryCode)) {
+                this.applyFieldsLock();
+            } else {
+                this.$postcode.off('blur input');
+                this.$housenumber.off('blur input');
+                this.$housenumberAddition.off('blur input');
+                this.hardResetFields();
+                this.releaseFieldsLock();
+            }
+        }, 1);
     };
 
     LookupHandler.prototype.reorderFields = function (selectedCountryCode) {
         if (this.isCountryEligibleForLookup(selectedCountryCode)) {
-            this.hardResetFields();
             setTimeout(() => {
+                this.hardResetFields();
                 if (selectedCountryCode === 'NL') {
                     // Set validators
                     this.markFieldsAsRequired([this.$streetField, this.$housenumberField]);
@@ -257,9 +260,9 @@ jQuery(document).ready(function ($) {
                     // Set validators
                     this.markFieldsAsRequired([this.$autocompleteMunicipalityField, this.$autocompleteStreetField, this.$housenumberField]);
                     // Show fields
-                    this.$autocompleteMunicipalityField.show();
+                    this.$autocompleteMunicipalityField.val('').show();
                     this.$autocompleteMunicipality.val('');
-                    this.$autocompleteStreetField.show();
+                    this.$autocompleteStreetField.val('').show();
                     this.$autocompleteStreet.val('');
                     // Hide fields
                     this.$postcodeField.hide();
@@ -274,8 +277,6 @@ jQuery(document).ready(function ($) {
             }, 1);
         } else {
             this.$streetField.hide();
-            this.$streetNumberField.hide();
-            this.$streetNumberSuffixField.hide();
             this.$address1Field.show();
             this.$address2Field.show();
             this.$autocompleteMunicipalityField.hide();
@@ -304,7 +305,7 @@ jQuery(document).ready(function ($) {
         this.$city.attr('readonly', true);
         this.$state.attr('readonly', true);
 
-        this.$stateField.addClass('spikkl-hidden');
+        this.$stateField.addClass('apichecknl-hidden');
     }
 
     LookupHandler.prototype.releaseFieldsLock = function () {
@@ -333,21 +334,26 @@ jQuery(document).ready(function ($) {
         this.$city.val('');
         this.$autocompleteMunicipality.val('');
         this.$autocompleteStreet.val('');
+        this.$autocompleteMunicipalityField.val('');
+        this.$cityField.val('');
+        this.$autocompleteStreetField.val('');
+        this.$postcodeField.val('');
+        this.$streetField.val('');
 
         this.softResetFields();
     };
 
     LookupHandler.prototype.isCountryEligibleForLookup = function (selectedCountryCode) {
         selectedCountryCode = selectedCountryCode || this.getSelectedCountryCode();
-        return spikkl_params.supported_countries.indexOf(selectedCountryCode) >= 0;
+        return apichecknl_params.supported_countries.indexOf(selectedCountryCode) >= 0;
     };
 
-    if (typeof spikkl_billing_fields !== 'undefined') {
-        new LookupHandler(spikkl_billing_fields);
+    if (typeof apichecknl_billing_fields !== 'undefined') {
+        new LookupHandler(apichecknl_billing_fields);
     }
 
-    if (typeof spikkl_shipping_fields !== 'undefined' && $('#ship-to-different-address-checkbox').length) {
-        new LookupHandler(spikkl_shipping_fields);
+    if (typeof apichecknl_shipping_fields !== 'undefined' && $('#ship-to-different-address-checkbox').length) {
+        new LookupHandler(apichecknl_shipping_fields);
     }
 
     /*
@@ -359,7 +365,7 @@ jQuery(document).ready(function ($) {
     LookupHandler.prototype.streetAutocompleteChange = debounce(function (prefix) {
         var street = this.$autocompleteStreet.val();
         var params = {
-            action: 'ac_search_address',
+            action: 'apichecknl_search_address',
             country: this.getSelectedCountryCode(),
             postalcode_id: prefix === 'billing' ? selectedBillingPostalcodeId : selectedShippingPostalcodeId,
             street: street
@@ -390,7 +396,7 @@ jQuery(document).ready(function ($) {
     LookupHandler.prototype.municipalityAutocompleteChange = debounce(function (prefix) {
         var municipality = this.$autocompleteMunicipality.val();
         var params = {
-            action: 'ac_search_address',
+            action: 'apichecknl_search_address',
             country: this.getSelectedCountryCode(),
         };
         // Show loader
@@ -474,12 +480,13 @@ jQuery(document).ready(function ($) {
       =========================
      */
     for (let type of ['billing', 'shipping']) {
-        jQuery(document).on("blur change", `#${type}_postcode, #${type}_housenumber, #${type}_housenumber_addition`, function () {
+        jQuery(document).on("blur change", `#${type}_postcode, #${type}_housenumber, #${type}_housenumber_addition`, () => {
             FieldChanged(type);
         });
     }
 
-    let prevSearchAddressValues = {billing:'',shipping:''};
+    let prevSearchAddressValues = {billing: '', shipping: ''};
+
     function FieldChanged(type) {
         var country = jQuery('#' + type + "_country option:selected").val().trim().toUpperCase();
         var postcode = jQuery('#' + type + "_postcode").val().trim() || jQuery('#' + type + '_municipality_postalcode').val().trim();
@@ -494,9 +501,8 @@ jQuery(document).ready(function ($) {
             prevSearchAddressValues[type] = hash;
 
 
-
             let params = {
-                'action': 'ac_search_address',
+                'action': 'apichecknl_search_address',
                 'country': country,
                 'number': housenumber,
             };
@@ -576,15 +582,15 @@ jQuery(document).ready(function ($) {
         console.trace('doing api call', data);
         return new Promise((resolve, reject) => {
             try {
-                jQuery.post(ac_ajax_object.ajax_url, data, function (response) {
+                jQuery.post(apichecknl_ajax_object.ajax_url, data, function (response) {
                     console.log(response);
                     if (response.status == 1) {
-                        jQuery(`.woocommerce-${type}-fields .acMessage`).remove();
+                        jQuery(`.woocommerce-${type}-fields .apichecknlMessage`).remove();
                         resolve(response);
                     } else {
                         // Something went wrong
-                        if (!jQuery(`.woocommerce-${type}-fields .acMessage`).length > 0) {
-                            jQuery(`#${type}_country_field`).after("<div class='acMessage'>" + response.result + "</div>");
+                        if (!jQuery(`.woocommerce-${type}-fields .apichecknlMessage`).length > 0) {
+                            jQuery(`#${type}_country_field`).after("<div class='apichecknlMessage'>" + response.result + "</div>");
                         }
                         reject();
                     }

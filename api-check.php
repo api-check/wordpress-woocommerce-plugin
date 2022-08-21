@@ -7,13 +7,13 @@
  * @package       APICHECK
  * @author        ApiCheck.nl
  * @license       gplv2
- * @version       1.0.3
+ * @version       1.0.4
  *
  * @wordpress-plugin
  * Plugin Name:   ApiCheck | Automatische Adres Aanvulling
  * Plugin URI:    https://apicheck.nl/wordpress-woocommerce
  * Description:   Deze plugin helpt de gebruikers bij het invullen van adresgegevens. Het doel van de plugin is het voorkomen van fouten tijdens het invullen van adresgegevens. Zodra een Nederlandse, Belgische of Luxemburgse gebruikers zijn/haar postcode en huisnummer invult haalt onze database direct de straat- en plaatsnaam erbij.
- * Version:       1.0.3
+ * Version:       1.0.4
  * Author:        ApiCheck
  * Author URI:    https://apicheck.nl/
  * Text Domain:   apicheck-woocommerce-postcode-checker
@@ -23,7 +23,7 @@
  *
  * WC requires at least: 3.7.0
  * WC tested up to: 6.8.0
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with ApiCheck Address Validator. If not, see <https://www.gnu.org/licenses/gpl-3.0.html/>.
  */
@@ -32,22 +32,22 @@
 if (!defined('ABSPATH')) exit;
 
 // Plugin name
-define('APICHECK_NAME', 'ApiCheck | Automatische Adres Aanvulling');
+define('APICHECKNL_NAME', 'ApiCheck | Automatische Adres Aanvulling');
 
 // Plugin version
-define('APICHECK_VERSION', '1.0.0');
+define('APICHECKNL_VERSION', '1.0.4');
 
 // Plugin Root File
-define('APICHECK_PLUGIN_FILE', __FILE__);
+define('APICHECKNL_PLUGIN_FILE', __FILE__);
 
 // Plugin base
-define('APICHECK_PLUGIN_BASE', plugin_basename(APICHECK_PLUGIN_FILE));
+define('APICHECKNL_PLUGIN_BASE', plugin_basename(APICHECKNL_PLUGIN_FILE));
 
 // Plugin Folder Path
-define('APICHECK_PLUGIN_DIR', plugin_dir_path(APICHECK_PLUGIN_FILE));
+define('APICHECKNL_PLUGIN_DIR', plugin_dir_path(APICHECKNL_PLUGIN_FILE));
 
 // Plugin Folder URL
-define('APICHECK_PLUGIN_URL', plugin_dir_url(APICHECK_PLUGIN_FILE));
+define('APICHECKNL_PLUGIN_URL', plugin_dir_url(APICHECKNL_PLUGIN_FILE));
 
 
 if (!function_exists('write_log')) {
@@ -66,13 +66,14 @@ if (!function_exists('write_log')) {
 
 }
 
+const APICHECKNL_SUPPORTED_COUNTRIES = ['NL', 'BE', 'LU'];
+
 
 class APICheck
 {
-    private static $_supported_countries = array('NL', 'LU', 'BE');
-    private static $_action = 'ac_search_address';
+    private static $_action = 'apichecknl_search_address';
 
-    private static $_billing = array(
+    private static $_billing = [
         'prefix' => 'billing',
         'company' => '#billing_company',
         'country' => '#billing_country',
@@ -87,9 +88,9 @@ class APICheck
         'housenumber_addition' => '#billing_housenumber_addition',
         'municipality_autocomplete' => '#billing_municipality_autocomplete',
         'street_autocomplete' => '#billing_street_autocomplete',
-    );
+    ];
 
-    private static $_shipping = array(
+    private static $_shipping = [
         'prefix' => 'shipping',
         'company' => '#shipping_company',
         'country' => '#shipping_country',
@@ -104,17 +105,17 @@ class APICheck
         'housenumber_addition' => '#shipping_housenumber_addition',
         'municipality_autocomplete' => '#shipping_municipality_autocomplete',
         'street_autocomplete' => '#shipping_street_autocomplete',
-    );
+    ];
 
     function __construct()
     {
-        add_action('init', array($this, 'ac_start_from_here'));
-        if (get_option('ac_enable_disabled') == 1) {
-            add_action('wp_enqueue_scripts', array($this, 'ac_enqueue_script_front'));
-            add_action('admin_init', array($this, 'bpem_if_woocommerce_not_active'));
-            add_filter('woocommerce_checkout_fields', array($this, 'custom_override_checkout_fields'), 1);
-            add_action('woocommerce_checkout_posted_data', array($this, 'checkout_posted_data'));
-            add_action('woocommerce_checkout_update_order_review', array($this, 'checkout_update_order_review'));
+        add_action('init', [$this, 'apichecknl_start_from_here']);
+        if (get_option('apichecknl_enable_disabled') == 1) {
+            add_action('wp_enqueue_scripts', [$this, 'apichecknl_enqueue_script_front']);
+            add_action('admin_init', [$this, 'bpem_if_woocommerce_not_active']);
+            add_filter('woocommerce_checkout_fields', [$this, 'custom_override_checkout_fields'], 1);
+            add_action('woocommerce_checkout_posted_data', [$this, 'checkout_posted_data']);
+            add_action('woocommerce_checkout_update_order_review', [$this, 'checkout_update_order_review']);
 
             add_action('woocommerce_after_checkout_validation', [$this, 'custom_checkout_validation']);
         }
@@ -124,46 +125,46 @@ class APICheck
     function bpem_if_woocommerce_not_active($message)
     {
         if (!is_plugin_active('woocommerce/woocommerce.php')) {
-            echo $message .= "<div class='notice notice-error is-dismissible'><h4>ApiCheck: WooCommerce is niet actief. Installeer WooCommerce om deze plugin te kunnen gebruiken.</h4></div>";
+            echo "<div class='notice notice-error is-dismissible'><h4>ApiCheck: WooCommerce is niet actief. Installeer WooCommerce om deze plugin te kunnen gebruiken.</h4></div>";
             deactivate_plugins('/api-check/api-check.php');
         }
     }
 
     // Add plugin files
-    function ac_start_from_here()
+    function apichecknl_start_from_here()
     {
-        require_once plugin_dir_path(__FILE__) . 'front/ac_search_address.php';
-        require_once plugin_dir_path(__FILE__) . 'back/ac_options_page.php';
+        require_once plugin_dir_path(__FILE__) . 'front/apichecknl_search_address.php';
+        require_once plugin_dir_path(__FILE__) . 'back/apichecknl_options_page.php';
     }
 
     // Enqueue Style and Scripts
-    function ac_enqueue_script_front()
+    function apichecknl_enqueue_script_front()
     {
         if (function_exists('is_checkout') && is_checkout()) {
             //Styles
-            wp_enqueue_style('ac-style', plugins_url('assets/css/apicheck.css', __FILE__), '1.0.0', 'all');
-            wp_enqueue_style('ac-autocomplete-style', plugins_url('assets/css/autocomplete.css', __FILE__), '1.0.0', 'all');
+            wp_enqueue_style('apichecknl-style', plugins_url('assets/css/apicheck.css', __FILE__), '1.0.0', 'all');
+            wp_enqueue_style('apichecknl-autocomplete-style', plugins_url('assets/css/autocomplete.css', __FILE__), '1.0.0', 'all');
 
             // Scripts
-            wp_register_script('ac-script', plugins_url('assets/js/apicheck.js', __FILE__), array('jquery', 'woocommerce'), '1.0.0', true);
-            wp_enqueue_script('ac-script');
+            wp_register_script('apichecknl-script', plugins_url('assets/js/apicheck.js', __FILE__), ['jquery', 'woocommerce'], '1.0.0', true);
+            wp_enqueue_script('apichecknl-script');
 
-            wp_localize_script('ac-script', 'apicheck_billing_fields', self::$_billing);
-            wp_localize_script('ac-script', 'apicheck_shipping_fields', self::$_shipping);
+            wp_localize_script('apichecknl-script', 'apichecknl_billing_fields', self::$_billing);
+            wp_localize_script('apichecknl-script', 'apichecknl_shipping_fields', self::$_shipping);
 
-            wp_localize_script('ac-script', 'apicheck_params', array(
+            wp_localize_script('apichecknl-script', 'apichecknl_params', [
                 'url' => admin_url('admin-ajax.php'),
                 'action' => self::$_action,
-                'supported_countries' => self::$_supported_countries,
-            ));
+                'supported_countries' => APICHECKNL_SUPPORTED_COUNTRIES,
+            ]);
 
             // Autocomplete script
-            wp_enqueue_script('ac-autocomplete-script', plugins_url('assets/js/autocomplete.min.js', __FILE__), '1.0.0', true);
+            wp_enqueue_script('apichecknl-autocomplete-script', plugins_url('assets/js/autocomplete.min.js', __FILE__), '1.0.0', true);
 
             wp_localize_script(
-                'ac-script',
-                'ac_ajax_object',
-                array('ajax_url' => admin_url('admin-ajax.php'))
+                'apichecknl-script',
+                'apichecknl_ajax_object',
+                ['ajax_url' => admin_url('admin-ajax.php')]
             );
         }
     }
@@ -172,126 +173,126 @@ class APICheck
     function custom_override_checkout_fields($fields)
     {
         // Billing fields
-        $fields['billing']['billing_municipality_autocomplete'] = array(
+        $fields['billing']['billing_municipality_autocomplete'] = [
             'id' => 'billing_municipality_autocomplete',
             'type' => 'text',
-            'class' => array('form-row form-row-wide validate-required'),
+            'class' => ['form-row form-row-wide validate-required'],
             'label' => 'Gemeente of postcode',
             'placeholder' => 'Start met typen...',
             'required' => false,
-        );
-        $fields['billing']['billing_municipality_city'] = array(
+        ];
+        $fields['billing']['billing_municipality_city'] = [
             'id' => 'billing_municipality_city',
             'type' => 'text',
-            'class' => array('form-row-wide hidden-checkout-field'),
+            'class' => ['form-row-wide hidden-checkout-field'],
             'label' => '',
             'placeholder' => '',
             'required' => false,
-        );
-        $fields['billing']['billing_municipality_postalcode'] = array(
+        ];
+        $fields['billing']['billing_municipality_postalcode'] = [
             'id' => 'billing_municipality_postalcode',
             'type' => 'text',
-            'class' => array('form-row-wide hidden-checkout-field'),
+            'class' => ['form-row-wide hidden-checkout-field'],
             'label' => '',
             'placeholder' => '',
             'required' => false,
-        );
+        ];
 
-        $fields['billing']['billing_street_autocomplete'] = array(
+        $fields['billing']['billing_street_autocomplete'] = [
             'id' => 'billing_street_autocomplete',
             'type' => 'text',
-            'class' => array('form-row form-row-wide validate-required'),
+            'class' => ['form-row form-row-wide validate-required'],
             'label' => 'Straat',
             'placeholder' => 'Start met typen...',
             'required' => false,
-        );
+        ];
 
-        $fields['billing']['billing_housenumber'] = array(
+        $fields['billing']['billing_housenumber'] = [
             'id' => 'billing_housenumber',
             'type' => 'text',
-            'class' => array('form-row form-row-first validate-require'),
+            'class' => ['form-row form-row-first validate-require'],
             'label' => 'Huisnummer',
             'placeholder' => '',
             'required' => true,
-        );
+        ];
 
-        $fields['billing']['billing_housenumber_addition'] = array(
+        $fields['billing']['billing_housenumber_addition'] = [
             'id' => 'billing_housenumber_addition',
             'type' => 'text',
-            'class' => array('form-row form-row-last'),
+            'class' => ['form-row form-row-last'],
             'label' => 'Toevoeging',
             'placeholder' => '',
             'required' => false,
-        );
+        ];
 
-        $fields['billing']['billing_street'] = array(
+        $fields['billing']['billing_street'] = [
             'type' => 'text',
-            'class' => array('form-row form-row-wide validate-required'),
+            'class' => ['form-row form-row-wide validate-required'],
             'label' => 'Straat',
             'placeholder' => '',
             'required' => true,
-        );
+        ];
 
         // Shipping fields
-        $fields['shipping']['shipping_municipality_autocomplete'] = array(
+        $fields['shipping']['shipping_municipality_autocomplete'] = [
             'id' => 'shipping_municipality_autocomplete',
             'type' => 'text',
-            'class' => array('form-row-wide'),
+            'class' => ['form-row-wide'],
             'label' => 'Gemeente of postcode',
             'placeholder' => 'Start met typen...',
             'required' => false,
-        );
-        $fields['shipping']['shipping_municipality_city'] = array(
+        ];
+        $fields['shipping']['shipping_municipality_city'] = [
             'id' => 'shipping_municipality_city',
             'type' => 'text',
-            'class' => array('form-row-wide hidden-checkout-field'),
+            'class' => ['form-row-wide hidden-checkout-field'],
             'label' => '',
             'placeholder' => '',
             'required' => false,
-        );
-        $fields['shipping']['shipping_municipality_postalcode'] = array(
+        ];
+        $fields['shipping']['shipping_municipality_postalcode'] = [
             'id' => 'shipping_municipality_postalcode',
             'type' => 'text',
-            'class' => array('form-row-wide hidden-checkout-field'),
+            'class' => ['form-row-wide hidden-checkout-field'],
             'label' => '',
             'placeholder' => '',
             'required' => false,
-        );
+        ];
 
-        $fields['shipping']['shipping_street_autocomplete'] = array(
+        $fields['shipping']['shipping_street_autocomplete'] = [
             'id' => 'shipping_street_autocomplete',
             'type' => 'text',
-            'class' => array('form-row-wide'),
+            'class' => ['form-row-wide'],
             'label' => 'Straat',
             'placeholder' => 'Start met typen...',
             'required' => false,
-        );
+        ];
 
-        $fields['shipping']['shipping_housenumber'] = array(
+        $fields['shipping']['shipping_housenumber'] = [
             'type' => 'text',
-            'class' => array('form-row form-row-first validate-require'),
+            'class' => ['form-row form-row-first validate-require'],
             'label' => 'Huisnummer',
             'placeholder' => '',
             'required' => true,
-        );
+        ];
 
-        $fields['shipping']['shipping_housenumber_addition'] = array(
+        $fields['shipping']['shipping_housenumber_addition'] = [
             'type' => 'text',
-            'class' => array('form-row form-row-last'),
+            'class' => ['form-row form-row-last'],
             'label' => 'Toevoeging',
             'placeholder' => '',
             'required' => false,
-        );
+        ];
 
-        $fields['shipping']['shipping_street'] = array(
+        $fields['shipping']['shipping_street'] = [
             'type' => 'text',
-            'class' => array('form-row-wide'),
+            'class' => ['form-row-wide'],
             'label' => 'Straat',
             'placeholder' => '',
             'required' => true,
-        );
+        ];
 
-        $billing_order = array(
+        $billing_order = [
             "billing_first_name",
             "billing_last_name",
             "billing_company",
@@ -307,9 +308,9 @@ class APICheck
             "billing_city",
             "billing_phone",
             "billing_email"
-        );
+        ];
 
-        $shipping_order = array(
+        $shipping_order = [
             "shipping_first_name",
             "shipping_last_name",
             "shipping_company",
@@ -323,7 +324,7 @@ class APICheck
             "shipping_housenumber_addition",
             "shipping_street",
             "shipping_city",
-        );
+        ];
 
         foreach ($billing_order as $field) {
             $ordered_billing_fields[$field] = $fields["billing"][$field];
@@ -348,7 +349,7 @@ class APICheck
     // This function makes sure the new fields are filled
     public function checkout_update_order_review($posted)
     {
-        $data = array();
+        $data = [];
         $vars = explode('&', $posted);
         foreach ($vars as $k => $value) {
             $v = explode('=', urldecode($value));
@@ -367,7 +368,7 @@ class APICheck
     // This function manipulates the incomming (new) fields
     public function checkout_posted_data($posted)
     {
-        if (get_option('ac_enable_disabled') == false) {
+        if (!get_option('apichecknl_enable_disabled')) {
             return $posted;
         }
 
