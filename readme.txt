@@ -6,7 +6,7 @@ Tags: WooCommerce, Postcode validatie, België, Nederland, Luxemburg, Postcode a
 Requires at least: 5.2
 Tested up to: 6.0.1
 Requires PHP: 7.0
-Stable tag: 1.0.4
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,10 +27,12 @@ Ondersteuning voor de landen:
 -   Nederland
 -   België
 -   Luxemburg
+-   Frankrijk
 
 Toekomstige ondersteuning:
--   Frankrijk
 -   Duitsland
+-   Spanje
+-   Italië
 
 Eenvoudig & Flexibel
 De WooCommerce Plugin werkt eenvoudig en bevat een goede uitleg, daarnaast is deze ook zeer flexibel in gebruik.
@@ -45,6 +47,8 @@ Deze plugin werkt in samenwerking met APICheck.nl & is volledig compatible met W
 4. Click on `Activate plugin`
 
 == Changelog ==
+= 1.0.6: August 28, 2022 =
+* Add support for France
 
 = 1.0.0: February 20, 2022 =
 * Initial release

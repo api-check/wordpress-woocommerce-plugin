@@ -6,8 +6,9 @@ add_action('wp_ajax_nopriv_apichecknl_search_address', 'apichecknl_search_addres
 const ALLOWED_APICHECKNL_SEARCH_ADDRESS_AJAX_STRINGS = [
     'postalcode',
     'street',
-    'numberaddition',
+    'numberAddition',
     'municipality',
+    'boxNumber'
 ];
 const ALLOWED_APICHECKNL_SEARCH_ADDRESS_AJAX_INTS = [
     'postalcode_id',
@@ -32,9 +33,14 @@ function apichecknl_search_address()
 
         $params = [];
 
+        if (isset($_POST['numberAddition'])) {
+            if ($_POST['numberAddition'] == '') {
+                unset($_POST['numberAddition']);
+            }
+        }
+
         // Create request params
         foreach ($_POST as $key => $value) {
-            $key = strtolower($key);
             if (in_array($key, ALLOWED_APICHECKNL_SEARCH_ADDRESS_AJAX_STRINGS)) {
                 $params[$key] = sanitize_text_field($value);
             } elseif (in_array($key, ALLOWED_APICHECKNL_SEARCH_ADDRESS_AJAX_INTS)) {
@@ -55,11 +61,16 @@ function apichecknl_search_address()
         $response = wp_remote_request($url, $args);
 
         if (is_object($response) && get_class($response) === 'WP_Error') {
-            write_log(var_export($response, true));
+            $apichecknl_error_message = wp_kses_post(get_option('apichecknl_error_message'));
+            $res = ["result" => $apichecknl_error_message, "status" => 0];
+            wp_send_json($res);
             wp_die();
         }
 
         if (!is_array($response) || !isset($response['body']) || !isset($response['response']['code'])) {
+            $apichecknl_error_message = wp_kses_post(get_option('apichecknl_error_message'));
+            $res = ["result" => $apichecknl_error_message, "status" => 0];
+            wp_send_json($res);
             wp_die();
         }
 

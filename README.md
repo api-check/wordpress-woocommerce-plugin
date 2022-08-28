@@ -2,7 +2,7 @@ ApiCheck Wordpress Woocommerce plugin
 =============
 
 This plugin is created to use the [ApiCheck](https://apicheck.nl) API to validate Woocommerce addresses.
-Currently supported countries: The Netherlands, Belgium, and Luxembourg.
+Currently supported countries: The Netherlands, Belgium, Luxembourg and France.
 
 Create account
 =============

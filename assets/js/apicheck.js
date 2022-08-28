@@ -5,6 +5,8 @@ jQuery(document).ready(function ($) {
     let selectedShippingPostalcodeId = null;
     let selectedShippingStreetId = null;
 
+    let debounceTimout = null;
+
     /*
       =========================
       Autocomplete configs
@@ -14,7 +16,7 @@ jQuery(document).ready(function ($) {
         selector: "#billing_municipality_autocomplete",
         placeHolder: "Start met typen...",
         cache: false,
-        debounce: 500,
+        debounce: 250,
         searchEngine: "loose",
         data: {
             src: [],
@@ -46,7 +48,7 @@ jQuery(document).ready(function ($) {
         selector: "#billing_street_autocomplete",
         placeHolder: "Start met typen...",
         cache: false,
-        debounce: 500,
+        debounce: 250,
         searchEngine: "loose",
         data: {
             src: [],
@@ -76,7 +78,7 @@ jQuery(document).ready(function ($) {
         selector: "#shipping_municipality_autocomplete",
         placeHolder: "Start met typen...",
         cache: false,
-        debounce: 500,
+        debounce: 250,
         searchEngine: "loose",
         data: {
             src: [],
@@ -108,7 +110,7 @@ jQuery(document).ready(function ($) {
         selector: "#shipping_street_autocomplete",
         placeHolder: "Start met typen...",
         cache: false,
-        debounce: 500,
+        debounce: 250,
         searchEngine: "loose",
         data: {
             src: [],
@@ -222,29 +224,13 @@ jQuery(document).ready(function ($) {
     };
 
     LookupHandler.prototype.reorderFields = function (selectedCountryCode) {
-        if (this.isCountryEligibleForLookup(selectedCountryCode)) {
+        if (this.isCountryEligibleForLookup(selectedCountryCode == true)) {
             setTimeout(() => {
                 this.hardResetFields();
-                if (selectedCountryCode === 'NL') {
+                if ((selectedCountryCode === 'NL') || (selectedCountryCode === 'LU') || (selectedCountryCode === 'FR')) {
                     // Set validators
                     this.markFieldsAsRequired([this.$streetField, this.$housenumberField]);
                     // Show fields
-                    this.$streetField.show();
-                    this.$cityField.show();
-                    this.$postcodeField.show();
-                    this.$housenumberField.show();
-                    this.$housenumberAdditionField.show();
-                    // Hide fields
-                    this.$autocompleteMunicipalityField.hide();
-                    this.$autocompleteStreetField.hide();
-
-                    this.$cityField.insertAfter(this.$streetField);
-                    this.$postcodeField.insertBefore(this.$housenumberField);
-                } else if (selectedCountryCode === 'LU') {
-                    // Set validators
-                    this.markFieldsAsRequired([this.$streetField, this.$housenumberField]);
-                    // Show fields
-
                     this.$streetField.show();
                     this.$cityField.show();
                     this.$postcodeField.show();
@@ -276,12 +262,14 @@ jQuery(document).ready(function ($) {
                 }
             }, 1);
         } else {
-            this.$streetField.hide();
-            this.$address1Field.show();
-            this.$address2Field.show();
-            this.$autocompleteMunicipalityField.hide();
-            this.$autocompleteStreetField.hide();
-            this.$cityField.before(this.$postcodeField);
+            // Selected country is not supported
+            setTimeout(() => {
+                this.$address1Field.show();
+                this.$address2Field.show();
+                this.$streetField.show();
+                this.$autocompleteMunicipalityField.hide();
+                this.$autocompleteStreetField.hide();
+            }, 1);
         }
     };
 
@@ -345,7 +333,11 @@ jQuery(document).ready(function ($) {
 
     LookupHandler.prototype.isCountryEligibleForLookup = function (selectedCountryCode) {
         selectedCountryCode = selectedCountryCode || this.getSelectedCountryCode();
-        return apichecknl_params.supported_countries.indexOf(selectedCountryCode) >= 0;
+        if (apichecknl_params.supported_countries.indexOf(selectedCountryCode) != -1) {
+            return true
+        } else {
+            return false;
+        }
     };
 
     if (typeof apichecknl_billing_fields !== 'undefined') {
@@ -480,75 +472,83 @@ jQuery(document).ready(function ($) {
       =========================
      */
     for (let type of ['billing', 'shipping']) {
-        jQuery(document).on("blur change", `#${type}_postcode, #${type}_housenumber, #${type}_housenumber_addition`, () => {
-            FieldChanged(type);
+        jQuery(document).on("input", `#${type}_postcode, #${type}_housenumber, #${type}_housenumber_addition`, () => {
+            clearTimeout(debounceTimout);
+            debounceTimout = setTimeout(function () {
+                FieldChanged(type)
+            }, 500);
         });
     }
 
-    let prevSearchAddressValues = {billing: '', shipping: ''};
+    let prevSearchAddressValues = { billing: '', shipping: '' };
 
     function FieldChanged(type) {
-        var country = jQuery('#' + type + "_country option:selected").val().trim().toUpperCase();
-        var postcode = jQuery('#' + type + "_postcode").val().trim() || jQuery('#' + type + '_municipality_postalcode').val().trim();
-        var housenumber = jQuery('#' + type + "_housenumber").val().trim();
-        var housenumberAddition = jQuery('#' + type + "_housenumber_addition").val().trim();
+        if (jQuery('#' + type + "_country option:selected").val() == undefined) {
+            var country = jQuery('#' + type + "_country").val();
+        } else {
+            var country = jQuery('#' + type + "_country option:selected").val().trim().toUpperCase();
+        }
 
-        if (country && housenumber && postcode) {
-            let hash = country + '/' + housenumber + '/' + housenumberAddition + '/' + postcode;
-            if (prevSearchAddressValues[type] === hash) {
-                return; // Prevent double searches
-            }
-            prevSearchAddressValues[type] = hash;
+        if (LookupHandler.prototype.isCountryEligibleForLookup(country)) {
+            var postcode = jQuery('#' + type + "_postcode").val().trim() || jQuery('#' + type + '_municipality_postalcode').val().trim();
+            var housenumber = jQuery('#' + type + "_housenumber").val().trim();
+            var housenumberAddition = jQuery('#' + type + "_housenumber_addition").val().trim();
 
-
-            let params = {
-                'action': 'apichecknl_search_address',
-                'country': country,
-                'number': housenumber,
-            };
-
-            if (country === 'BE') {
-                /*be?postalcode_id=908&street_id=96511&number=1&boxNumber=*/
-                params.postalcode_id = type === 'billing' ? selectedBillingPostalcodeId : selectedShippingPostalcodeId;
-                params.street_id = type === 'billing' ? selectedBillingStreetId : selectedBillingStreetId;
-                if (housenumberAddition) {
-                    params.boxNumber = housenumberAddition;
+            if (country && housenumber && postcode) {
+                let hash = country + '/' + housenumber + '/' + housenumberAddition + '/' + postcode;
+                if (prevSearchAddressValues[type] === hash) {
+                    return; // Prevent double searches
                 }
-            } else {
-                params.postalcode = postcode;
-                if (housenumberAddition) {
-                    params.numberAddition = housenumberAddition;
+                prevSearchAddressValues[type] = hash;
+
+                let params = {
+                    'action': 'apichecknl_search_address',
+                    'country': country,
+                    'number': housenumber,
+                };
+
+                if (country === 'BE') {
+                    /*be?postalcode_id=908&street_id=96511&number=1&boxNumber=*/
+                    params.postalcode_id = type === 'billing' ? selectedBillingPostalcodeId : selectedShippingPostalcodeId;
+                    params.street_id = type === 'billing' ? selectedBillingStreetId : selectedBillingStreetId;
+                    if (housenumberAddition) {
+                        params.boxNumber = housenumberAddition;
+                    }
+                } else {
+                    params.postalcode = postcode;
+                    if (housenumberAddition) {
+                        params.numberAddition = housenumberAddition;
+                    }
                 }
+
+                // Show loader
+                jQuery('#' + type + '_street').css("opacity", "0.5").addClass('loadinggif');
+                jQuery('#' + type + '_city').css("opacity", "0.5").addClass('loadinggif');
+
+                doApiCall(params, type).then((data => {
+                    // Hide loader
+                    jQuery('#' + type + '_street')
+                        .css("opacity", 1)
+                        .removeClass('loadinggif')
+                        .val(data.result.data.street);
+                    jQuery('#' + type + '_city')
+                        .css("opacity", 1)
+                        .removeClass('loadinggif')
+                        .val(data.result.data.city);
+                }), error => {
+                    // Hide loader
+                    jQuery('#' + type + '_street')
+                        .css("opacity", 1)
+                        .removeClass('loadinggif')
+                        .val('')
+                        .removeAttr('readonly');
+                    jQuery('#' + type + '_city')
+                        .css("opacity", 1)
+                        .removeClass('loadinggif')
+                        .val('')
+                        .removeAttr('readonly');
+                });
             }
-
-
-            // Show loader
-            jQuery('#' + type + '_street').css("opacity", "0.5").addClass('loadinggif');
-            jQuery('#' + type + '_city').css("opacity", "0.5").addClass('loadinggif');
-
-            doApiCall(params, type).then((data => {
-                // Hide loader
-                jQuery('#' + type + '_street')
-                    .css("opacity", 1)
-                    .removeClass('loadinggif')
-                    .val(data.result.data.street);
-                jQuery('#' + type + '_city')
-                    .css("opacity", 1)
-                    .removeClass('loadinggif')
-                    .val(data.result.data.city);
-            }), error => {
-                // Hide loader
-                jQuery('#' + type + '_street')
-                    .css("opacity", 1)
-                    .removeClass('loadinggif')
-                    .val('')
-                    .removeAttr('readonly');
-                jQuery('#' + type + '_city')
-                    .css("opacity", 1)
-                    .removeClass('loadinggif')
-                    .val('')
-                    .removeAttr('readonly');
-            });
         }
     }
 
@@ -579,25 +579,26 @@ jQuery(document).ready(function ($) {
 
     function doApiCall(data, type) {
         type = type.replace('#', '');
-        console.trace('doing api call', data);
         return new Promise((resolve, reject) => {
             try {
                 jQuery.post(apichecknl_ajax_object.ajax_url, data, function (response) {
-                    console.log(response);
                     if (response.status == 1) {
                         jQuery(`.woocommerce-${type}-fields .apichecknlMessage`).remove();
                         resolve(response);
                     } else {
                         // Something went wrong
                         if (!jQuery(`.woocommerce-${type}-fields .apichecknlMessage`).length > 0) {
-                            jQuery(`#${type}_country_field`).after("<div class='apichecknlMessage'>" + response.result + "</div>");
+                            jQuery(`#${type}_country_field`).after("<div id='apichecknlMessage' class='apichecknlMessage'>" + response.result + "</div>");
+                            const element = document.getElementById("apichecknlMessage");
+                            element.scrollIntoView();
                         }
                         reject();
                     }
                 });
             } catch (e) {
-                console.error('err below');
-                console.error(e);
+                jQuery(`#${type}_country_field`).after("<div id='apichecknlMessage' class='apichecknlMessage'>" + response.result + "</div>");
+                const element = document.getElementById("apichecknlMessage");
+                element.scrollIntoView();
                 reject(e);
             }
         });

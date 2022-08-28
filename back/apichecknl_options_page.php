@@ -27,10 +27,10 @@ function register_apichecknl_plugin_settings()
 
 function apichecknl_plugin_settings_page()
 {
-    ?>
+?>
     <div class="wrap" style="background: #fff; padding: 10px 20px;">
 
-        <img height="60px" src="<?php echo(APICHECKNL_PLUGIN_URL) ?>/assets/img/logo.png" alt="ApiCheck Logo">
+        <img height="60px" src="<?php echo (APICHECKNL_PLUGIN_URL) ?>/assets/img/logo.png" alt="ApiCheck Logo">
 
         <h1>ApiCheck</h1>
         <hr>
@@ -40,6 +40,10 @@ function apichecknl_plugin_settings_page()
             De klant vult postcode en huisnummer in en krijgt vervolgens direct zijn straatnaam te zien.
         </p>
 
+        <?php if (isset($_GET['settings-updated'])) {
+            echo "<div class='updated'><p>De instellingen zijn opgeslagen.</p></div>";
+        } ?>
+
         <form method="post" action="options.php">
             <?php settings_fields('apichecknl-plugin-settings-group'); ?>
             <?php do_settings_sections('apichecknl-plugin-settings-group'); ?>
@@ -47,25 +51,20 @@ function apichecknl_plugin_settings_page()
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Schakel plugin in</th>
-                    <td><input type="checkbox" name="apichecknl_enable_disabled"
-                               value="1" <?php checked(1, get_option('apichecknl_enable_disabled'), true); ?> /></td>
+                    <td><input type="checkbox" name="apichecknl_enable_disabled" value="1" <?php checked(1, get_option('apichecknl_enable_disabled'), true); ?> /></td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">API Key</th>
                     <td>
-                        <input class="regular-text" type="text" name="apichecknl_api_key"
-                               value="<?php echo esc_attr(get_option('apichecknl_api_key')); ?>"
-                               placeholder="Vul je APiCheck api-key in"/>
+                        <input class="regular-text" type="text" name="apichecknl_api_key" value="<?php echo esc_attr(get_option('apichecknl_api_key')); ?>" placeholder="Vul je APiCheck api-key in" />
                     </td>
                 </tr>
 
                 <tr valign="top">
                     <th scope="row">Melding geen adres gevonden</th>
                     <td>
-                        <input class="regular-text" type="text" name="apichecknl_error_message"
-                               value="<?php echo esc_attr(get_option('apichecknl_error_message')); ?>"
-                               placeholder="Welke melding moet er getoond worden indien er geen adres is gevonden?"/>
+                        <input class="regular-text" type="text" name="apichecknl_error_message" value="<?php echo esc_attr(get_option('apichecknl_error_message')); ?>" placeholder="Welke melding moet er getoond worden indien er geen adres is gevonden?" />
                     </td>
                 </tr>
             </table>

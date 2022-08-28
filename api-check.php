@@ -7,13 +7,13 @@
  * @package       APICHECK
  * @author        ApiCheck.nl
  * @license       gplv2
- * @version       1.0.4
+ * @version       1.0.6
  *
  * @wordpress-plugin
  * Plugin Name:   ApiCheck | Automatische Adres Aanvulling
  * Plugin URI:    https://apicheck.nl/wordpress-woocommerce
  * Description:   Deze plugin helpt de gebruikers bij het invullen van adresgegevens. Het doel van de plugin is het voorkomen van fouten tijdens het invullen van adresgegevens. Zodra een Nederlandse, Belgische of Luxemburgse gebruikers zijn/haar postcode en huisnummer invult haalt onze database direct de straat- en plaatsnaam erbij.
- * Version:       1.0.4
+ * Version:       1.0.6
  * Author:        ApiCheck
  * Author URI:    https://apicheck.nl/
  * Text Domain:   apicheck-woocommerce-postcode-checker
@@ -35,7 +35,7 @@ if (!defined('ABSPATH')) exit;
 define('APICHECKNL_NAME', 'ApiCheck | Automatische Adres Aanvulling');
 
 // Plugin version
-define('APICHECKNL_VERSION', '1.0.4');
+define('APICHECKNL_VERSION', '1.0.6');
 
 // Plugin Root File
 define('APICHECKNL_PLUGIN_FILE', __FILE__);
@@ -66,7 +66,7 @@ if (!function_exists('write_log')) {
 
 }
 
-const APICHECKNL_SUPPORTED_COUNTRIES = ['NL', 'BE', 'LU'];
+const APICHECKNL_SUPPORTED_COUNTRIES = ['NL', 'BE', 'LU', 'FR'];
 
 
 class APICheck
